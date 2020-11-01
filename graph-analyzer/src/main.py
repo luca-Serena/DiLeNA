@@ -22,7 +22,7 @@ def analyze_loaded(graph, processNumber, weight=False):
 	#submit global metrics
 	graph_analyzer.add_metric("graph_nodes_number", metric= metrics.nodes_number)
 	graph_analyzer.add_metric("graph_edges_number", metric= metrics.edges_number)
-	graph_analyzer.add_metric("graph_load_centrality", metric=metrics.load_centrality)
+	#graph_analyzer.add_metric("graph_load_centrality", metric=metrics.load_centrality)
 	graph_analyzer.add_metric("graph_clust_coeff", metric=metrics.clustering_coefficient)
 	graph_analyzer.add_metric("graph_deg_distr_tot", 
 		metric=metrics.degree_distribution, args=("tot", ))
