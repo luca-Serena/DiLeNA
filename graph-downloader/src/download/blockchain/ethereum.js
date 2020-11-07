@@ -97,9 +97,8 @@ function initWeb3() {
     if (web3 == undefined) {
         web3 = new Web3(
             Web3.givenProvider ||
-            //`https://mainnet.infura.io/v3/${RunSettings.getAPI()}`
-                `https://mainnet.infura.io/v3/54109a08287a4f9aa15e0742a87b1fca`//
-            //    `https://mainnet.infura.io/${RunSettings.getAPI()}:8546`
+            'https://mainnet.infura.io/v3/${RunSettings.getAPI()}`
+
         )
     }
 }
