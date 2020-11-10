@@ -36,7 +36,7 @@ toDownload = lastBlock - firstBlock
 blockIterator = firstBlock
 with open(fileRes, 'w') as f:
 	while blockIterator <=lastBlock:
-		r = requests.get('https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=' + hex(blockIterator) +'&boolean=true&apikey=J5R7CZPRK7GET1VP1BWIB487JYM518NV5K' + key).json()
+		r = requests.get('https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=' + hex(blockIterator) +'&boolean=true&apikey=' + key).json()
 		print (str(blockIterator - firstBlock) + ' / ' + str(toDownload))
 		for t in r['result']['transactions']:
 			sender = t['from']
