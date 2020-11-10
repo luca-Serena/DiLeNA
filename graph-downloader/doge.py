@@ -1,5 +1,6 @@
 import requests
 import datetime
+import sys
 
 class Transaction:
   def __init__(self, sender, receiver, amount):
@@ -9,10 +10,15 @@ class Transaction:
 
 start="2020-09-01 00:00:00"
 end="2020-09-01 00:10:00"
-nodeSet = set()
 transList=[]
 nodeDict={}
 indexIterator=1
+fileRes = "res/file.net"
+if len(sys.argv) > 2:
+	start = sys.argv[1]
+	end = sys.argv[2]
+	if len(sys.argv) == 4:
+		fileRes = sys.argv[3]
 
 def findFirstBlock (timeBound, index):
 	step = 10000
@@ -47,19 +53,19 @@ def findLastBlock (timeBound, index):
 			index = index + step
 	return index
 
-
-
+print ("Finding the index of the first block")
 firstBlock = findFirstBlock(start, 3450000)
+print ("Finding the index of the last block")
 lastBlock = findLastBlock (end, firstBlock)
-
 blockIterator = firstBlock
+print("Start reading the blocks")
+
 with open('file.net', 'w') as f:
 	while blockIterator <=lastBlock:
 		r = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(blockIterator)).json()
 		print (datetime.datetime.fromtimestamp(r['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
 		for t in r['data']['txs']:
 			tx = requests.get('https://sochain.com/api/v2/get_tx/DOGE/' + t).json()
-			#print (datetime.datetime.fromtimestamp(tx['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
 			for i in tx['data']['inputs']:
 				if (i['address'] not in nodeDict):
 						nodeDict[i['address']] = indexIterator
@@ -68,8 +74,7 @@ with open('file.net', 'w') as f:
 					if (o['address'] not in nodeDict):
 						nodeDict[o['address']] = indexIterator
 						indexIterator += 1
-					#print (i['address'] + " " + o['address'], file = f)
-					transList.append (Transaction(i['address'], o['address'], 0))
+					transList.append (Transaction(i['address'], o['address'], 0))  #amount currently disabled
 		blockIterator += 1
 
 	print ('*Vertices ' + str(len(nodeDict)), file=f)
