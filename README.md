@@ -1,6 +1,6 @@
 # DiLeNA
 
-Graph Downloader: \
+Graph Downloader: 
 
 Examples:
 #to download Ripple transactions in a certain time interval \
