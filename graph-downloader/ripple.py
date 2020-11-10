@@ -15,7 +15,7 @@ end="2020-10-01T00:00:00"
 fileRes = "res/file.net"
 if len(sys.argv) > 2:
 	start = list(sys.argv[1])
-	start[10] = 'T'             #adding 'T' between date and hour as requested by the API
+	start[10] = 'T'             #adding 'T' between date and hour 
 	start = "".join(start)
 	end = list(sys.argv[2])
 	end[10] = 'T'

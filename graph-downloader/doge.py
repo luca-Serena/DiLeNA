@@ -15,8 +15,12 @@ nodeDict={}
 indexIterator=1
 fileRes = "res/file.net"
 if len(sys.argv) > 2:
-	start = sys.argv[1]
-	end = sys.argv[2]
+	start = list(sys.argv[1])
+	start[10] = ' '             #adding ' ' between date and hour as requested by the API
+	start = "".join(start)
+	end = list(sys.argv[2])
+	end[10] = ' '
+	end = "".join(end)
 	if len(sys.argv) == 4:
 		fileRes = sys.argv[3]
 

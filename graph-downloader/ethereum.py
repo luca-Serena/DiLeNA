@@ -13,18 +13,20 @@ start="2020-04-01 00:00:00"
 end="2020-04-01 00:10:00"
 if len(sys.argv) > 4:
 	key = sys.argv[1]
-	start = sys.argv[2]
-	end = sys.argv[3]
+	start = list(sys.argv[2])
+	start[10] = ' '             #adding ' ' between date and hour 
+	start = "".join(start)
+	end = list(sys.argv[3])
+	end[10] = ' '
+	end = "".join(end)
 	if len(sys.argv) == 5:
 		fileRes = sys.argv[4]
 		
-nodeSet = set()
 transList=[]
 nodeDict={}
 indexIterator=1
 startTimestamp = int( datetime.datetime.timestamp(datetime.datetime.strptime(start, '%Y-%m-%d %H:%M:%S'))) #from date to timestamp
 endTimestamp = int( datetime.datetime.timestamp(datetime.datetime.strptime(end, '%Y-%m-%d %H:%M:%S')))
-key = 'J5R7CZPRK7GET1VP1BWIB487JYM518NV5K'
 firstBlock = int (requests.get ('https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=' + 
 	str(startTimestamp) + '&closest=after&apikey=' + key).json()['result'])
 lastBlock = int (requests.get ('https://api.etherscan.io/api?module=block&action=getblocknobytime&timestamp=' + 

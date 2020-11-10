@@ -42,7 +42,7 @@ xrp | ripple | Ripple | XRP)
   python3 ripple.py $START $END $RES
   ;;
 doge | dogecoin | Dogecoin | DOGE)
-  python3 doge.py $START $END $RES
+  python3 doge.py $STAT $END $RES
   ;;
 *)
   echo "DLT not available. Allowed options are: -eth, -btc -xrp, -doge"
