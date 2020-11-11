@@ -15,7 +15,7 @@ to download Ripple transactions in a certain time interval \
 
 ## Graph Analyzer:
 
-###Metrics calculated:
+### Metrics calculated:
 
 * Number of Nodes
 * Number of Edges
