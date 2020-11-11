@@ -2,7 +2,7 @@
 
 ## Graph Downloader: 
 
-Examples:
+### Examples:
 
 to download Ripple transactions in a certain time interval \
 ```
@@ -14,7 +14,8 @@ to download Ripple transactions in a certain time interval \
 
 
 ## Graph Analyzer:
-Metrics calculated:
+
+###Metrics calculated:
 
 * Number of Nodes
 * Number of Edges
@@ -40,7 +41,7 @@ python3 main.py -graph=string -result=string -process=int -weight=bool
 * -processNum = (OPTIONAL) number of process for better performance, default is 1 (sequential execution) recommended core number. 
 * -weight = (OPTIONAL) also compute average path length weighted, default is False, high cost.
 
- Output
+ ### Output
 
 Some notes about format:
 * All degrees are key-value structure, the number of pairs can be different.
