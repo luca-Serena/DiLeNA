@@ -22,7 +22,7 @@ python3 main.py -graph=string -result=string -process=int -weight=bool
 * -processNum = (OPTIONAL) number of process for better performance, default is 1 (sequential execution) recommended core number. 
 * -weight = (OPTIONAL) also compute average path length weighted, default is False, high cost.
 
-# Output
+ Output
 
 Some notes about format:
 * All degrees are key-value structure, the number of pairs can be different.
