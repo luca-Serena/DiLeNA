@@ -5,15 +5,31 @@
 Examples:
 
 to download Ripple transactions in a certain time interval \
-'''
+```
 ./main.sh -dlt xrp -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/xrp.net' \
 ./main.sh -dlt eth -api 'your Etherscan.io key' -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ethereum.net' \
 ./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' \
 ./main.sh -dlt btc -start "2020-04-01" -end "2020-04-01" \
-'''
+```
 
 
 ## Graph Analyzer:
+Metrics calculated:
+
+* Number of Nodes
+* Number of Edges
+* Tot Degree Distribution
+* In Degree Distribution
+* Out Degree Distribution
+* Clustering coefficient
+* Average path length (only main component)
+
+Compare data with random graph for small world property.  
+
+### Getting Started
+
+For use this project simply clone this project, install python 3 and Networkx.
+
 
 ```
 python3 main.py -graph=string -result=string -process=int -weight=bool
