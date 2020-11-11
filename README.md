@@ -4,7 +4,7 @@
 
 Examples:
 
-#to download Ripple transactions in a certain time interval \
+to download Ripple transactions in a certain time interval \
 ./main.sh -dlt xrp -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/xrp.net' \
 ./main.sh -dlt eth -api 'your Etherscan.io key' -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ethereum.net' \
 ./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' \
@@ -22,7 +22,7 @@ python3 main.py -graph=string -result=string -process=int -weight=bool
 * -processNum = (OPTIONAL) number of process for better performance, default is 1 (sequential execution) recommended core number. 
 * -weight = (OPTIONAL) also compute average path length weighted, default is False, high cost.
 
-## Output
+# Output
 
 Some notes about format:
 * All degrees are key-value structure, the number of pairs can be different.
