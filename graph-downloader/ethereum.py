@@ -50,7 +50,7 @@ with open(fileRes, 'w') as f:
 				nodeDict[recipient] = indexIterator
 				indexIterator += 1
 				#print (i['address'] + " " + o['address'], file = f)
-				transList.append (Transaction(sender, recipient, amount))
+			transList.append (Transaction(sender, recipient, amount))
 		blockIterator += 1
 
 	print ('*Vertices ' + str(len(nodeDict)), file=f)
