@@ -2,6 +2,7 @@ from ripple_api import RippleDataAPIClient
 import json
 from pprint import pprint
 import sys
+import datetime
 
 class Transaction:
   def __init__(self, sender, receiver, amount):
@@ -29,45 +30,19 @@ iter=1
 
 #Sometimes weird input are received, in case advance 1 second the start time
 def progressStartDate(start):
-	print ("weird input received, moving on")
-	newSec = int(start[17] + start[18]) + 1
-	newStr = str(newSec)
-	still = False
-	if newSec < 10:
-		newStr = '0' + str(newSec)
-	if newSec > 59:
-		newStr = '00'
-		still = True
-	start = list(start)
-	start[17] = newStr[0]
-	start[18] = newStr[1]
-	start = "".join(start)
-	if still == True:
-		still = False
-		newMin = int(start[14] + start[15]) + 1
-		newStr = str(newMin)
-		if newMin < 10:
-			newStr = '0' + str(newMin)
-		if newMin > 59:
-			newStr = '00'
-			still = True
-		start = list(start)
-		start[14] = newStr[0]
-		start[15] = newStr[1]
-		start = "".join(start)	
-		if still == False:
-			newHour = int(start[11] + start[12]) + 1
-			newStr = str(newHour)
-			if newHour < 10:
-				newStr = '0' + str(newHour)
-			start = list(start)
-			start[11] = newStr[0]
-			start[12] = newStr[1]
-			start = "".join(start)	
-	return start
+	if len (start) > 19:
+		start = start [: -6] # cut +00:00
+	oldDate = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S')
+	newDate = oldDate + datetime.timedelta(0,1)
+	return newDate.strftime('%Y-%m-%dT%H:%M:%S')
 
+
+avoidLoopsDate = ''
 with open(fileRes, 'w') as f:
 	while start < end:
+		if avoidLoopsDate == start:
+			start = progressStartDate(start)
+		avoidLoopsDate = start
 		print (start)
 		params = {"start" : start, "type": "Payment", "end" : end, "limit" : 100 }
 		query_params = dict(params)
@@ -81,7 +56,6 @@ with open(fileRes, 'w') as f:
 					if (t["tx"]["Destination"] not in nodeDict):
 						nodeDict[t["tx"]["Destination"]] = iter
 						iter += 1
-					
 					amount = t["tx"]["Amount"]
 					if (isinstance(t["tx"]["Amount"], dict)):
 						amount = t["tx"]["Amount"]["value"]		
