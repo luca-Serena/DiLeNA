@@ -2,6 +2,25 @@
 
 ## Graph Downloader: 
 
+### Usage Bitcoin 
+
+Bitcoin downloader is based on a previous version of the software thus the following tools are required:
+*   Node.js
+*   [Pm2](http://pm2.keymetrics.io/)
+
+Build the src files (for Bitcoin):
+```
+$ npm run flow:build
+```
+The server is meant to be ran using `pm2`.
+
+```
+$ pm2 start ecosystem.config.js
+```
+will start the server instances configured inside `ecosystem.config.js`.
+
+By default the web server will serve on port `8888`.
+
 ### Examples:
 
 to download Ripple transactions in a certain time interval \
@@ -11,7 +30,7 @@ to download Ripple transactions in a certain time interval \
 ./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' \
 ./main.sh -dlt btc -start "2020-04-01" -end "2020-04-01" \
 ```
-
+For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur
 
 ## Graph Analyzer:
 
@@ -39,7 +58,6 @@ python3 main.py -graph=string -result=string -process=int -weight=bool
 * -graph = path of graph reachable from src. 
 * -result = name of file with results.
 * -processNum = (OPTIONAL) number of process for better performance, default is 1 (sequential execution) recommended core number. 
-* -weight = (OPTIONAL) also compute average path length weighted, default is False, high cost.
 
  ### Output
 
