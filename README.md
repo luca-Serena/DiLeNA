@@ -23,7 +23,7 @@ By default the web server will serve on port `8888`.
 
 ### Examples:
 
-to download Ripple transactions in a certain time interval \
+to download DLT transactions in a certain time interval:
 ```
 ./main.sh -dlt xrp -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/xrp.net' \
 ./main.sh -dlt eth -api 'your Etherscan.io key' -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ethereum.net' \
@@ -31,6 +31,7 @@ to download Ripple transactions in a certain time interval \
 ./main.sh -dlt btc -start "2020-04-01" -end "2020-04-01" \
 ```
 For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur
+For Ripple, Ethereum and Dogecoin it is necessary to install python3 
 
 ## Graph Analyzer:
 
