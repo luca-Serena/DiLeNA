@@ -19,7 +19,7 @@ $ pm2 start ecosystem.config.js
 ```
 will start the server instances configured inside `ecosystem.config.js`.
 
-By default the web server will serve on port `8888`. \
+By default the web server will serve on port `8888`. 
 
 The other DLTs are downloaded with Python3 code
 
