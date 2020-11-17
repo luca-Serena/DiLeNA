@@ -19,7 +19,9 @@ $ pm2 start ecosystem.config.js
 ```
 will start the server instances configured inside `ecosystem.config.js`.
 
-By default the web server will serve on port `8888`.
+By default the web server will serve on port `8888`. \
+
+The other DLTs are downloaded with Python3 code
 
 ### Examples:
 
@@ -30,8 +32,8 @@ to download DLT transactions in a certain time interval:
 ./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' -cores 8
 ./main.sh -dlt btc -start "2020-04-01" -end "2020-04-01" 
 ```
-For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur
-For Ripple, Ethereum and Dogecoin it is necessary to install python3 
+For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur \
+For Ripple, Ethereum and Dogecoin it is necessary to install python3 \
 Ripple requires library ripple_api, which can be downloaded with the command ``` pip install python-ripple-lib```
 
 ## Graph Analyzer:
