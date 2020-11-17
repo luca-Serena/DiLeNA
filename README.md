@@ -34,7 +34,7 @@ to download DLT transactions in a certain time interval:
 ```
 For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur \
 For Ripple, Ethereum and Dogecoin it is necessary to install python3 \
-Ripple requires library ripple_api, which can be downloaded with the command ``` pip install python-ripple-lib```
+Ripple requires library [ripple_api](https://pypi.org/project/python-ripple-lib/)
 
 ## Graph Analyzer:
 
