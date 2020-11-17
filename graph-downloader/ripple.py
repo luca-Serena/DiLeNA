@@ -1,6 +1,7 @@
 from ripple_api import RippleDataAPIClient
 import json
 from pprint import pprint
+import multiprocessing as mp
 import sys
 import datetime
 
@@ -10,24 +11,6 @@ class Transaction:
     self.receiver = receiver
     self.amount = amount
 
-api = RippleDataAPIClient('https://data.ripple.com')
-start="2020-09-04T20:14:40"
-end="2020-10-01T00:00:00"
-fileRes = "res/file.net"
-if len(sys.argv) > 2:
-	start = list(sys.argv[1])
-	start[10] = 'T'             #adding 'T' between date and hour 
-	start = "".join(start)
-	end = list(sys.argv[2])
-	end[10] = 'T'
-	end = "".join(end)
-	if len(sys.argv) == 4:
-		fileRes = sys.argv[3]
-	
-transList=[]
-nodeDict={}
-iter=1
-
 #Sometimes weird input are received, in case advance 1 second the start time
 def progressStartDate(start):
 	if len (start) > 19:
@@ -36,26 +19,39 @@ def progressStartDate(start):
 	newDate = oldDate + datetime.timedelta(0,1)
 	return newDate.strftime('%Y-%m-%dT%H:%M:%S')
 
+def splitInterval (start, end, batches):
+	sd = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S')
+	ed = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S')
+	diff = int((ed-sd).total_seconds())
+	tSplit = int(diff / batches)
+	res = []
+	iterDate = sd
+	for i in range (batches):
+		endBatch =  iterDate + datetime.timedelta(0,tSplit)
+		temp = [iterDate.strftime('%Y-%m-%dT%H:%M:%S'), endBatch.strftime('%Y-%m-%dT%H:%M:%S')]
+		iterDate = endBatch + datetime.timedelta(0, 1)
+		res.append(temp)
+	res [-1][1] = end
+	return res
 
-avoidLoopsDate = ''
-with open(fileRes, 'w') as f:
+#called by each core. Just payment transactions are stored
+def download (intervals):
+	start = intervals[0]
+	end = intervals[1]
+	avoidLoopsDate = ''
 	while start < end:
 		if avoidLoopsDate == start:
 			start = progressStartDate(start)
 		avoidLoopsDate = start
-		print (start)
+		print (start + "   Process: " + str(mp.current_process().pid))
 		params = {"start" : start, "type": "Payment", "end" : end, "limit" : 100 }
 		query_params = dict(params)
 		txs = api.get_transactions(**query_params)
 		if "transactions" in txs:
 			for t in txs["transactions"]:
 				if (t["tx"]["Account"] != t["tx"]["Destination"] and start < end):
-					if (t["tx"]["Account"] not in nodeDict):
-						nodeDict[t["tx"]["Account"]] = iter
-						iter += 1
-					if (t["tx"]["Destination"] not in nodeDict):
-						nodeDict[t["tx"]["Destination"]] = iter
-						iter += 1
+					nodeSet.add(t["tx"]["Account"])
+					nodeSet.add(t["tx"]["Destination"])
 					amount = t["tx"]["Amount"]
 					if (isinstance(t["tx"]["Amount"], dict)):
 						amount = t["tx"]["Amount"]["value"]		
@@ -63,10 +59,45 @@ with open(fileRes, 'w') as f:
 				start = t["date"]
 		else: 
 			start = progressStartDate(start)
-			
-	print ('*Vertices ' + str(len(nodeDict)), file=f)
-	for elem in nodeDict:
-		print (str(nodeDict[elem]) + ' "' + str(elem) + '"', file = f)
+	return transList, nodeSet
+
+
+api = RippleDataAPIClient('https://data.ripple.com')
+start="2020-09-01T00:00:00"
+end="2020-09-01T00:04:00"
+fileRes = "res/file.net"
+cores = 1
+if len(sys.argv) > 2:
+	start = list(sys.argv[1])
+	start[10] = 'T'          	   	#adding 'T' between date and hour as requested for the format
+	start = "".join(start)
+	end = list(sys.argv[2])
+	end[10] = 'T'
+	end = "".join(end)
+	if len(sys.argv) > 3:      	# file where to store the output
+		fileRes = sys.argv[3]
+	if len(sys.argv) == 5:			#number of cores to use
+		cores = int(sys.argv[4])
+	
+transList=[]		
+nodeSet = set()						#set of nodes. Set data structure helps avoiding repetitions
+nodeDict={}							#it will map incremental int id with addresses
+pool = mp.Pool(processes=cores) 
+dates_pairs = splitInterval (start, end, cores)
+print (dates_pairs)
+parallelRes = pool.map(download, dates_pairs)
+for batch in parallelRes:
+	for item in batch[1]:
+		nodeSet.add(item)
+	for item in batch[0]:
+		transList.append(item)
+
+with open(fileRes, 'w') as f:	
+	print ("Saving the graph in " + fileRes)
+	print ('*Vertices ' + str(len(nodeSet)), file=f)
+	for elem in enumerate (nodeSet):
+		nodeDict[elem[1]] = elem[0]
+		print (str(elem[0]) + ' "' + str(elem[1]) + '"', file = f)
 		
 	print ("*Arcs", file = f)
 	for t in transList:

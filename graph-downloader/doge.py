@@ -1,4 +1,5 @@
 import requests
+import multiprocessing as mp
 import datetime
 import sys
 
@@ -8,12 +9,80 @@ class Transaction:
     self.receiver = receiver
     self.amount = amount
 
+def findFirstBlock (timeBound, index):
+	step = 10000
+	descending = True
+	while step > 0 or time < timeBound:   #finding the index of the blocks immediately before the lower bound and then returning index+1
+		time = datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index)).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S')
+		if time < timeBound:
+			index = index + step 
+			if descending == True:
+				step = int(step/2)   
+				descending = False
+		else: #time >, to decrease
+			index = index - step
+			if descending ==False:
+				step = int(step/2)
+				descending = True
+	#print (datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index + 1)).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
+	return index + 1
+
+def findLastBlock (timeBound, index):
+	step = 10000
+	time = ''
+	while step > 0:
+		#print (str(time) + " ___" + str(timeBound) + "    " + str(step))
+		response = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index + step))
+		exceed = False
+		if response == '<Response [404]>':
+			exceed = True
+		else:
+			time = datetime.datetime.fromtimestamp(response.json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S')
+			exceed = time > timeBound
+
+		if exceed:
+			step = int(step/2)
+		else:
+			index = index + step
+	print (datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index )).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
+	return index
+
+def splitInterval (start, end, batches):
+	each = int((end - start + 1) / batches)
+	res = []
+	iterator = start
+	for i in range (batches):
+		res.append([iterator, (iterator + each - 1)])
+		iterator += each
+	res [-1][1] = end
+	return res
+
+def download(intervals):
+	lowerB = intervals[0] 
+	upperB = intervals[1]
+	blockIterator = lowerB
+
+	while blockIterator <= upperB:
+		r = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(blockIterator)).json()
+		print (datetime.datetime.fromtimestamp(r['data']['time']).strftime('%Y-%m-%d %H:%M:%S') + '   '+str(mp.current_process().pid))
+		for t in r['data']['txs']:
+			tx = requests.get('https://sochain.com/api/v2/get_tx/DOGE/' + t).json()
+			for i in tx['data']['inputs']:
+				nodeSet.add(i['address'])
+				for o in tx['data']['outputs']:
+					nodeSet.add(o['address'])
+					transList.append (Transaction(i['address'], o['address'], 0))  #amount currently disabled
+		blockIterator += 1
+
+	return nodeSet, transList
+
 start="2020-09-01 00:00:00"
 end="2020-09-01 00:10:00"
 transList=[]
+nodeSet = set()
 nodeDict={}
-indexIterator=1
-fileRes = "res/file.net"
+fileRes = "res/doge.net"
+cores = 1
 if len(sys.argv) > 2:
 	start = list(sys.argv[1])
 	start[10] = ' '             #adding ' ' between date and hour as requested by the API
@@ -21,70 +90,33 @@ if len(sys.argv) > 2:
 	end = list(sys.argv[2])
 	end[10] = ' '
 	end = "".join(end)
-	if len(sys.argv) == 4:
+	if len(sys.argv) > 3:
 		fileRes = sys.argv[3]
-
-def findFirstBlock (timeBound, index):
-	step = 10000
-	while step > 1:
-		#print (index)
-		time = datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index)).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S')
-		if time < timeBound:
-			index = index + step - 1
-			step = int(step/2)
-
-		else:
-			index = index - step
-	return index
-
-def findLastBlock (timeBound, index):
-	step = 10000
-	time = ''
-	while step > 1:
-		#print (index)
-		response = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index))
-		overlap = False
-		if response == '<Response [404]>':
-			overlap = True
-		else :
-			time = datetime.datetime.fromtimestamp(response.json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S')
-			overlap = time > timeBound
-
-		if overlap:
-			index = index - step + 1
-			step = int(step/2)
-		else:
-			index = index + step
-	return index
+	if len(sys.argv) == 5:
+		cores = int(sys.argv[4])
+pool = mp.Pool(processes=cores) 
 
 print ("Finding the index of the first block")
 firstBlock = findFirstBlock(start, 3450000)
 print ("Finding the index of the last block")
 lastBlock = findLastBlock (end, firstBlock)
-blockIterator = firstBlock
 print("Start reading the blocks")
+dates_pairs = splitInterval (firstBlock, lastBlock, cores)
 
-with open('file.net', 'w') as f:
-	while blockIterator <=lastBlock:
-		r = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(blockIterator)).json()
-		print (datetime.datetime.fromtimestamp(r['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
-		for t in r['data']['txs']:
-			tx = requests.get('https://sochain.com/api/v2/get_tx/DOGE/' + t).json()
-			for i in tx['data']['inputs']:
-				if (i['address'] not in nodeDict):
-						nodeDict[i['address']] = indexIterator
-						indexIterator += 1
-				for o in tx['data']['outputs']:
-					if (o['address'] not in nodeDict):
-						nodeDict[o['address']] = indexIterator
-						indexIterator += 1
-					transList.append (Transaction(i['address'], o['address'], 0))  #amount currently disabled
-		blockIterator += 1
+parallelRes = pool.map(download, dates_pairs)
+for batch in parallelRes:
+	for item in batch[0]:
+		nodeSet.add(item)
+	for item in batch[1]:
+		transList.append(item)
 
-	print ('*Vertices ' + str(len(nodeDict)), file=f)
-	for elem in nodeDict:
-		print (str(nodeDict[elem]) + ' "' + str(elem) + '"', file = f)
+with open(fileRes, 'w') as f:	
+	print ("Saving the graph in " + fileRes)
+	print ('*Vertices ' + str(len(nodeSet)), file=f)
+	for elem in enumerate (nodeSet):
+		nodeDict[elem[1]] = elem[0]
+		print (str(elem[0]) + ' "' + str(elem[1]) + '"', file = f)
 		
-	print ("*Arcs", file = f)
+	print ("*Arcs " + str(len(transList)), file = f)
 	for t in transList:
 		print (str(nodeDict[t.sender]) + ' ' +  str(nodeDict[t.receiver]) + ' ' + str(t.amount), file = f)
