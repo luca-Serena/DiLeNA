@@ -2,6 +2,7 @@ import requests
 import multiprocessing as mp
 import datetime
 import sys
+import time
 
 class Transaction:
   def __init__(self, sender, receiver, amount):
@@ -9,6 +10,7 @@ class Transaction:
     self.receiver = receiver
     self.amount = amount
 
+#Find index of the first block
 def findFirstBlock (timeBound, index):
 	step = 10000
 	descending = True
@@ -24,9 +26,10 @@ def findFirstBlock (timeBound, index):
 			if descending ==False:
 				step = int(step/2)
 				descending = True
-	#print (datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index + 1)).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
+
 	return index + 1
 
+#find index of the last block
 def findLastBlock (timeBound, index):
 	step = 10000
 	time = ''
@@ -44,9 +47,10 @@ def findLastBlock (timeBound, index):
 			step = int(step/2)
 		else:
 			index = index + step
-	print (datetime.datetime.fromtimestamp(requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(index )).json()['data']['time']).strftime('%Y-%m-%d %H:%M:%S'))
+
 	return index
 
+#share the workload
 def splitInterval (start, end, batches):
 	each = int((end - start + 1) / batches)
 	res = []
@@ -57,6 +61,7 @@ def splitInterval (start, end, batches):
 	res [-1][1] = end
 	return res
 
+
 def download(intervals):
 	lowerB = intervals[0] 
 	upperB = intervals[1]
@@ -66,18 +71,25 @@ def download(intervals):
 		r = requests.get('https://sochain.com/api/v2/get_block/DOGE/'+ str(blockIterator)).json()
 		print (datetime.datetime.fromtimestamp(r['data']['time']).strftime('%Y-%m-%d %H:%M:%S') + '   '+str(mp.current_process().pid))
 		for t in r['data']['txs']:
-			tx = requests.get('https://sochain.com/api/v2/get_tx/DOGE/' + t).json()
-			for i in tx['data']['inputs']:
-				nodeSet.add(i['address'])
-				for o in tx['data']['outputs']:
-					nodeSet.add(o['address'])
-					transList.append (Transaction(i['address'], o['address'], 0))  #amount currently disabled
+			tx = requests.get('https://sochain.com/api/v2/get_tx/DOGE/' + t)
+			try:
+				tx = tx.json()
+				for i in tx['data']['inputs']:
+					nodeSet.add(i['address'])
+					for o in tx['data']['outputs']:
+						nodeSet.add(o['address'])
+						transList.append (Transaction(i['address'], o['address'], 0))  #amount currently disabled
+			except:
+				print ("Transaction not available, too many requests. Waiting...")
+				time.sleep(cores * 5)
 		blockIterator += 1
 
 	return nodeSet, transList
 
+
+
 start="2020-09-01 00:00:00"
-end="2020-09-01 00:10:00"
+end="2020-09-01 00:30:00"
 transList=[]
 nodeSet = set()
 nodeDict={}
@@ -111,7 +123,7 @@ for batch in parallelRes:
 		transList.append(item)
 
 with open(fileRes, 'w') as f:	
-	print ("Saving the graph in " + fileRes)
+	print ("Saving the graph in " + fileRes)	
 	print ('*Vertices ' + str(len(nodeSet)), file=f)
 	for elem in enumerate (nodeSet):
 		nodeDict[elem[1]] = elem[0]
@@ -120,3 +132,4 @@ with open(fileRes, 'w') as f:
 	print ("*Arcs " + str(len(transList)), file = f)
 	for t in transList:
 		print (str(nodeDict[t.sender]) + ' ' +  str(nodeDict[t.receiver]) + ' ' + str(t.amount), file = f)
+	
