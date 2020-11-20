@@ -12,11 +12,15 @@ class Transaction:
 def download(intervals):
 	lowerB = int(intervals[0])
 	upperB = int(intervals[1])
+	errCount = 0
+	unfixedErrors = 0
 	iterator = lowerB
 	while iterator <= upperB:
 		r = requests.get('https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=' + hex(iterator) +'&boolean=true&apikey=' + key).json()
 		print (str(iterator - lowerB + 1) + ' / ' + str(upperB - lowerB + 1) + "   Process: " + str(mp.current_process().pid))
+		iterator += 1
 		if 'result' in r and 'transactions' in r['result']:
+			errCount = 0                      		#resetting error count if no error occurred
 			for t in r['result']['transactions']:
 				sender = t['from']
 				recipient = t['to']
@@ -24,10 +28,16 @@ def download(intervals):
 				nodeSet.add(sender)
 				nodeSet.add(recipient)
 				transList.append (Transaction(sender, recipient, amount))
-		else:
-			print ('Input error on the block occurred, moving on')
-		iterator += 1
-	return transList, nodeSet
+		else:  		                                 #in case of input error, try up to 3 times. If still errors occur, moving to next block
+			errCount += 1
+			if errCount > 3:						 # give up, block not retrieved
+				print ('Input error on the block occurred, moving on')
+				unfixedErrors += 1
+			else:
+				print ('Input error number '+ str(errCount) + ' , trying again')
+				iterator -= 1                         #trying again with the same block
+
+	return transList, nodeSet, unfixedErrors
 
 
 def splitInterval (start, end, batches):
@@ -42,8 +52,8 @@ def splitInterval (start, end, batches):
 
 fileRes = 'res/eth.net'
 start="2020-04-01 00:00:00"
-end="2020-04-01 00:10:00"
-key = 'J5R7CZPRK7GET1VP1BWIB487JYM518NV5K'
+end="2020-04-01 00:20:00"
+key = ''
 cores = 1
 if len(sys.argv) > 4:
 	key = sys.argv[1]
@@ -69,6 +79,7 @@ transList=[]
 nodeSet = set()
 nodeDict={}
 pool = mp.Pool(processes=cores) 
+errors = 0 #number of blocks the program was not able to retrieve
 dates_pairs = splitInterval (firstBlock, lastBlock, cores)
 parallelRes = pool.map(download, dates_pairs)
 for batch in parallelRes:
@@ -76,10 +87,12 @@ for batch in parallelRes:
 		nodeSet.add(item)
 	for item in batch[0]:
 		transList.append(item)
+	errors += batch[2]
+
 
 with open(fileRes, 'w') as f:	
 	print ("Saving the graph in " + fileRes)
-	print ('*Vertices ' + str(len(nodeSet)), file=f)
+	print ('*Vertices ' + str(len(nodeSet)) + "    Errors: " + str(errors) , file=f)
 	for elem in enumerate (nodeSet):
 		nodeDict[elem[1]] = elem[0]
 		print (str(elem[0]) + ' "' + str(elem[1]) + '"', file = f)
