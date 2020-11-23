@@ -1,6 +1,4 @@
 from ripple_api import RippleDataAPIClient
-import json
-from pprint import pprint
 import multiprocessing as mp
 import sys
 import datetime
@@ -23,7 +21,7 @@ def splitInterval (start, end, batches):
 	sd = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%S')
 	ed = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S')
 	diff = int((ed-sd).total_seconds())
-	tSplit = int(diff / batches)
+	tSplit = int(diff / batches) - 1
 	res = []
 	iterDate = sd
 	for i in range (batches):
@@ -44,7 +42,7 @@ def download (intervals):
 			start = progressStartDate(start)
 		avoidLoopsDate = start
 		print (start + "   Process: " + str(mp.current_process().pid))
-		params = {"start" : start, "type": "Payment", "end" : end, "limit" : 100 }
+		params = {"start" : start, "type": "Payment",  "limit" : 100 }
 		query_params = dict(params)
 		txs = api.get_transactions(**query_params)
 		if "transactions" in txs:
@@ -55,18 +53,19 @@ def download (intervals):
 					amount = t["tx"]["Amount"]
 					if (isinstance(t["tx"]["Amount"], dict)):
 						amount = t["tx"]["Amount"]["value"]		
-					transList.append (Transaction(t["tx"]["Account"], t["tx"]["Destination"], amount))
+					transList.append (Transaction(t["tx"]["Account"], t["tx"]["Destination"], (amount + " " + str(mp.current_process().pid)) ))
 				start = t["date"]
 		else: 
 			start = progressStartDate(start)
+
 	return transList, nodeSet
 
 
 api = RippleDataAPIClient('https://data.ripple.com')
-start="2020-09-01T00:00:00"
-end="2020-09-01T00:04:00"
-fileRes = "res/file.net"
-cores = 1
+start="2019-01-01T00:00:00"
+end="2019-01-01T00:10:00"
+fileRes = "res/4file.net"
+cores = 4
 if len(sys.argv) > 2:
 	start = list(sys.argv[1])
 	start[10] = 'T'          	   	#adding 'T' between date and hour as requested for the format
