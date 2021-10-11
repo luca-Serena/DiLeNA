@@ -4,7 +4,29 @@
 
 ### Usage Bitcoin 
 
-Bitcoin downloader is based on a previous version of the software thus the following tools are required:
+
+
+The other DLTs are downloaded with Python3 code
+
+### Examples:
+
+to download DLT transactions in a certain time interval:
+```
+./main.sh -dlt xrp -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/xrp.net' -cores 4
+./main.sh -dlt eth -api 'your Etherscan.io key' -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ethereum.net' -cores 4
+./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' -cores 4
+./main.sh -dlt btc -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/btc.net'
+./main.sh -dlt ltc -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ltc.net'
+./main.sh -dlt dash -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/dash.net'
+./main.sh -dlt zec -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/zec.net'
+```
+
+For Bitcoin only, a previous version of the sofftware is still available, which might turn out to be faster. To download in this alternative way
+```
+./main.sh -dlt btc2 -start "2020-04-01" -end "2020-04-01" 
+```
+
+For this version of the software the following tools are required:
 *   Node.js
 *   [Pm2](http://pm2.keymetrics.io/)
 
@@ -21,19 +43,12 @@ will start the server instances configured inside `ecosystem.config.js`.
 
 By default the web server will serve on port `8888`. 
 
-The other DLTs are downloaded with Python3 code
 
-### Examples:
+**************************************************************************************************************************************************
 
-to download DLT transactions in a certain time interval:
-```
-./main.sh -dlt xrp -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/xrp.net' -cores 8
-./main.sh -dlt eth -api 'your Etherscan.io key' -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/ethereum.net' -cores 8
-./main.sh -dlt doge -start "2020-04-01-00:00:00" -end "2020-04-01-00:01:00" -res 'res/doge.net' -cores 8
-./main.sh -dlt btc -start "2020-04-01" -end "2020-04-01" 
-```
+
 For dowloading Etherum blocks an `Etherscan.io` key is needed, otherwise restrictions occur \
-For Ripple, Ethereum and Dogecoin it is necessary to install python3 \
+For Ripple, Ethereum and Dogecoin, Zcash, Dash, Litecoin it is necessary to install python3 \
 Ripple requires library [ripple_api](https://pypi.org/project/python-ripple-lib/)
 
 ## Graph Analyzer:
