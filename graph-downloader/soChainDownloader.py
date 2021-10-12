@@ -1,3 +1,15 @@
+'''	##############################################################################################
+	DILENA, Distributed Ledger Network Analyzer			http://pads.cs.unibo.it
+
+	Description:
+		- download transaction graphs of certain Distributed Ledgers, at given time intervals
+		- analyze the transaction graphs with multiple metrics
+
+	Software developed by ANANSI research group:
+		Gabriele D'Angelo <g.@unibo.it> Stefano Ferretti <stefano.ferretti@uniurb.it> Luca Serena <luca.serena2@unibo.it> Mirko Zichichi <mirko.zichichi@upm.es>
+
+	############################################################################################### '''
+
 import requests
 import multiprocessing as mp
 import datetime
