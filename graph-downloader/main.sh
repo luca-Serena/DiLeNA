@@ -41,13 +41,25 @@ eth | ethereum | Ethereum | ETH)
   python3 ethereum.py $API $START $END $RES $CORES
   ;;
 btc | bitcoin | Bitcoin | BTC) 
+  python3 soChainDownloader.py 'BTC' $START $END $RES $CORES
+  ;;  
+btc2 | bitcoin2 | Bitcoin2 | BTC2) 
   node ./build/no-layout/start-no-layout.js -type=btc -firstDate=$START -lastDate=$END
   ;;
 xrp | ripple | Ripple | XRP)
   python3 ripple.py $START $END $RES $CORES
   ;;
 doge | dogecoin | Dogecoin | DOGE)
-  python3 doge.py $START $END $RES $CORES
+  python3 soChainDownloader.py 'DOGE' $START $END $RES $CORES
+  ;;
+zcash | ZCash | zec | ZEC)
+  python3 soChainDownloader.py 'ZEC' $END $RES $CORES
+  ;;
+dash | DASH)
+  python3 soChainDownloader.py 'DASH' $START $END $RES $CORES
+  ;;
+LTC | ltc | Litecoin| litecoin)
+  python3 soChainDownloader.py 'LTC' $START $END $RES $CORES
   ;;
 *)
   echo "DLT not available. Allowed options are: -eth, -btc -xrp, -doge"
