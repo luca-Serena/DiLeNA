@@ -53,7 +53,7 @@ doge | dogecoin | Dogecoin | DOGE)
   python3 soChainDownloader.py 'DOGE' $START $END $RES $CORES
   ;;
 zcash | ZCash | zec | ZEC)
-  python3 soChainDownloader.py 'ZEC' $END $RES $CORES
+  python3 soChainDownloader.py 'ZEC' $START $END $RES $CORES
   ;;
 dash | DASH)
   python3 soChainDownloader.py 'DASH' $START $END $RES $CORES
@@ -62,7 +62,7 @@ LTC | ltc | Litecoin| litecoin)
   python3 soChainDownloader.py 'LTC' $START $END $RES $CORES
   ;;
 *)
-  echo "DLT not available. Allowed options are: -eth, -btc -xrp, -doge"
+  echo "DLT not available. Allowed options are: -eth, -btc -xrp, -doge, -zec, -dash, -ltc"
   ;;
 esac
 
