@@ -46,7 +46,7 @@ By default the web server will serve on port `8888`.
 
 
 
-For Ripple only, python-ripple-lib library is required.
+For Ripple only, python-ripple-lib library is required, and it can be installed with the following command:
 
 ``` pip3 install python-ripple-lib ```
 
