@@ -85,6 +85,10 @@ python3 main.py -graph=string -result=string -process=int -weight=bool
 * -result = name of file with results.
 * -processNum = (OPTIONAL) number of process for better performance, default is 1 (sequential execution) recommended core number. 
 
+For example:
+
+``` python3 main.py -graph="graph.net" -result='res' ```
+
  ### Output
 
 Some notes about format:
